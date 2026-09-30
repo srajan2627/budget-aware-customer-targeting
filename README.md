@@ -104,6 +104,39 @@ python -m jupyterlab code/EDA/631_InitialHillstromExploration.ipynb
 
 Select the environment's Python kernel and run the cells in order. The first cell also installs scikit-uplift and seaborn. Internet access is needed for package installation and the initial dataset download. These setup commands have not yet been validated in a clean environment.
 
+## Development / final-test split
+
+Set up and activate the project environment from the repository root:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python code/data/split_data.py
+```
+
+In a new terminal, activate it again with `source .venv/bin/activate` from
+the repository root. If already inside `code/data`, use
+`source ../../.venv/bin/activate` and then `python split_data.py`.
+
+`code/data/load_hillstrom.py` loads the data and applies the notebook's
+deterministic cleaning. `code/data/split_data.py` reserves 20% for final testing
+with `random_state=42`, stratified by treatment × conversion. It saves
+`datasets/processed/development.csv` (51,200 customers) and `test.csv`
+(12,800 customers). Rerunning replaces these exports with the same split for
+the same source data. Use `--output-dir PATH` to choose another directory.
+
+Both files retain all features, treatment, and outcomes. Read them with
+`pd.read_csv(path, index_col="source_row")` to preserve the original row indices;
+`source_row` is a tracking index, not a customer feature or a true customer ID.
+Keep treatment and post-campaign outcomes out of customer feature inputs.
+
+The EDA notebook also contains the split cell immediately before Section 23.
+Stop at that cell for now: the later preprocessing cells still fit on the full
+dataset and must be revised in the next step. Use development data for training
+and model selection, fitting preprocessing within each training fold. Reserve
+test outcomes for the final evaluation. Initial EDA used the full dataset.
+
 ## Remaining implementation
 
 - [ ] Establish a reproducible environment, dependency versions, and experiment configurations.

@@ -1,0 +1,5 @@
+# Dependencies for loading Hillstrom and creating development/test splits.
+numpy
+pandas
+scikit-learn
+scikit-uplift

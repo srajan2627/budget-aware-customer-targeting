@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv/
+.ipynb_checkpoints/
+.DS_Store
+~$*
+
+# Reproducible downloaded data and split exports.
+/datasets/raw/*.csv.gz
+/datasets/processed/development.csv
+/datasets/processed/test.csv
