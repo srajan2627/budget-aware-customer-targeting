@@ -53,14 +53,24 @@ These are descriptive results from the supplied notebook and presentation, not h
 
 The notebook trims string fields, corrects `Surburban` to `Suburban`, and checks binary values. It includes median/mode imputation logic, although the inspected data has no missing values.
 
-It prepares these in-memory objects:
+The notebook now splits customers before learned preprocessing and prepares:
 
-- `X_model`: **64,000 × 7** selected pre-campaign features.
-- `X_cluster` / `X_cluster_df`: **64,000 × 11** features for future clustering, using log-transformed historical spending, standardized numeric fields, and one-hot encoded geography and channel.
-- `X_encoded` / `X_encoded_df`: **64,000 × 11** features for future supervised or uplift models, with numeric scaling, binary passthrough, and categorical encoding.
-- Separate outcome vectors (`y_visit`, `y_conversion`, `y_spend`) and the treatment assignment.
+- Raw development and test inputs with the seven pre-campaign features.
+- Five shared development folds stratified by treatment × conversion.
+- Development-fitted supervised and segmentation feature matrices, each with
+  11 columns on this dataset, plus test features transformed with those same
+  fitted preprocessors.
 
-Treatment and post-campaign outcomes are excluded from customer feature matrices. **The current notebook fits preprocessing on the full dataset for exploration.** Before evaluating models, create train/validation/test splits and fit learned preprocessing only on training data to prevent information leakage. The notebook does not currently export the prepared matrices to disk.
+Treatment and post-campaign outcomes are excluded from feature matrices.
+Supervised preprocessing imputes numeric medians, scales numeric features,
+mode-imputes binary features, and mode-imputes/one-hot encodes categories.
+Segmentation additionally uses log history and scales binary attributes.
+Unknown categories are ignored during transformation.
+
+The full-development matrices are for inspecting feature preparation. During
+model selection, use raw inputs and fit a fresh preprocessing/model pipeline
+within each training fold. Never cross-validate the already transformed
+full-development matrices. Model training and final test evaluation are pending.
 
 ## Repository structure
 
@@ -68,7 +78,7 @@ Treatment and post-campaign outcomes are excluded from customer feature matrices
 .
 ├── code/
 │   ├── EDA/                 # Initial Hillstrom exploration notebook
-│   ├── data/                # Planned reusable loading and preprocessing code
+│   ├── data/                # Reusable loading, splitting, preprocessing, and CV code
 │   ├── models/              # Planned segmentation, response, and uplift models
 │   ├── targeting/           # Planned customer selection and treatment policies
 │   └── evaluation/          # Planned budget and reliability evaluation
@@ -131,16 +141,44 @@ Both files retain all features, treatment, and outcomes. Read them with
 `source_row` is a tracking index, not a customer feature or a true customer ID.
 Keep treatment and post-campaign outcomes out of customer feature inputs.
 
-The EDA notebook also contains the split cell immediately before Section 23.
-Stop at that cell for now: the later preprocessing cells still fit on the full
-dataset and must be revised in the next step. Use development data for training
-and model selection, fitting preprocessing within each training fold. Reserve
-test outcomes for the final evaluation. Initial EDA used the full dataset.
+The EDA notebook contains the split immediately before Section 23. Sections
+23–28 now use development-fitted preprocessing and only transform final test
+features. Reserve test outcomes for final evaluation. Initial descriptive EDA
+used the full dataset.
+
+### Shared cross-validation and preprocessing
+
+With the project environment active, run from the repository root:
+
+```bash
+python code/data/development_cv.py
+python -m unittest discover -s tests -v
+```
+
+From `code/data`, the first command is `python development_cv.py`.
+It reads only `development.csv` and saves `development_folds.csv`, mapping
+original source rows to validation folds 1–5. Each fold has 40,960 training
+customers and 10,240 validation customers. The same seed and input order
+reproduce the assignments; all competing methods must reuse them. If loading
+saved assignments after reordering data, align them by `source_row`.
+
+`preprocessing.py` provides `build_preprocessor()` for supervised models and
+`build_preprocessor(segmentation=True)` for clustering. Both return unfitted
+transformers. For model selection, place a fresh transformer and the estimator
+in a scikit-learn `Pipeline`, then pass the raw development features and
+`cv=make_development_folds(development_df)` to cross-validation or grid search.
+This lets each fold learn its own medians, modes, scaling statistics, and
+category vocabulary. Refit the selected pipeline on all development data only
+after model selection, then use it for the final test comparison.
+
+The tests check missing and unseen values, feature exclusion, unchanged fitted
+statistics after held-out transformation, reproducible fold membership, and
+fold-specific fitting through a pipeline on synthetic data.
 
 ## Remaining implementation
 
 - [ ] Establish a reproducible environment, dependency versions, and experiment configurations.
-- [ ] Build reusable data preparation with held-out splits and training-only preprocessing.
+- [x] Build reusable data preparation with held-out splits and training-only preprocessing.
 - [ ] Select a cluster count, fit customer segments, and profile their treatment responses after clustering.
 - [ ] Train a purchase-probability baseline (called the propensity baseline in the presentation).
 - [ ] Implement T-Learner, X-Learner, and ensemble uplift models for each email treatment versus control.
