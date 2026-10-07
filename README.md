@@ -12,7 +12,7 @@ A purchase-probability model ranks customers by their likelihood of buying. Upli
 
 ## Current status
 
-**Initial EDA and feature preparation are complete. Model training and campaign evaluation are pending.** The repository contains an exploratory notebook with saved outputs and a project progress presentation. It does not yet contain trained predictive or uplift models, fitted customer segments, budget-constrained targeting policies, or a generative campaign pipeline.
+**EDA, data preparation, and the first baseline comparison are complete.** Regularized logistic regression and a constrained decision tree have been evaluated using the same five development folds. Response and T-learner policies are compared with no contact and fixed-email random targeting. Final test evaluation, uncertainty analysis, customer clustering, and generative campaigns remain pending.
 
 - [Initial Hillstrom exploration notebook](code/EDA/631_InitialHillstromExploration.ipynb)
 - [Project progress presentation](docs/presentations/CIS631_Project_Progress_Report.pptx)
@@ -34,7 +34,7 @@ The notebook loads the **Hillstrom email marketing dataset** through `sklift.dat
 - Three post-campaign outcomes: website visit (`visit`), purchase (`conversion`), and spending (`spend`).
 - Seven selected pre-campaign modeling features: `recency`, `history`, `mens`, `womens`, `newbie`, `zip_code`, and `channel`. The original data also includes `history_segment`, which is not included in this selected feature set.
 
-The planned causal comparisons evaluate each email treatment separately against the shared no-email control group. Dataset files are not currently stored in `datasets/`; the notebook retrieves data through the loader.
+The planned causal comparisons evaluate each email treatment separately against the shared no-email control group. The loader caches raw data locally, and the split script saves development/test CSVs in `datasets/processed`. These reproducible data exports are ignored by Git.
 
 ## Completed exploration
 
@@ -70,7 +70,7 @@ Unknown categories are ignored during transformation.
 The full-development matrices are for inspecting feature preparation. During
 model selection, use raw inputs and fit a fresh preprocessing/model pipeline
 within each training fold. Never cross-validate the already transformed
-full-development matrices. Model training and final test evaluation are pending.
+full-development matrices. Baseline model training is implemented below; final test evaluation is pending.
 
 ## Repository structure
 
@@ -79,9 +79,9 @@ full-development matrices. Model training and final test evaluation are pending.
 ├── code/
 │   ├── EDA/                 # Initial Hillstrom exploration notebook
 │   ├── data/                # Reusable loading, splitting, preprocessing, and CV code
-│   ├── models/              # Planned segmentation, response, and uplift models
-│   ├── targeting/           # Planned customer selection and treatment policies
-│   └── evaluation/          # Planned budget and reliability evaluation
+│   ├── models/              # Baseline response and T-learner models
+│   ├── targeting/           # Budget-constrained targeting policies
+│   └── evaluation/          # Initial development policy evaluation
 ├── configs/                 # Planned experiment settings and model parameters
 ├── datasets/
 │   ├── raw/                 # Reserved for original dataset files
@@ -97,7 +97,7 @@ full-development matrices. Model training and final test evaluation are pending.
 └── README.md
 ```
 
-Folders marked planned or reserved currently contain `.gitkeep` placeholders. The existing EDA notebook lives in `code/EDA/`.
+Some planned or reserved folders still contain `.gitkeep` placeholders. The existing EDA notebook lives in `code/EDA/`.
 
 ## Running the EDA notebook
 
@@ -175,14 +175,115 @@ The tests check missing and unseen values, feature exclusion, unchanged fitted
 statistics after held-out transformation, reproducible fold membership, and
 fold-specific fitting through a pipeline on synthetic data.
 
+## Step 3 Baseline comparison
+
+Activate the project environment and run from the repository root:
+
+```bash
+source .venv/bin/activate
+python code/models/run_baselines.py
+```
+
+If your terminal is already in `code/data`, run
+`python ../models/run_baselines.py` after activating `../../.venv/bin/activate`.
+The runner reads only development data, reuses the saved fold assignments by
+source row, and writes results to `results/baselines`. If fold assignments are
+missing, it creates and saves five stratified folds. Existing output files are
+replaced on rerun. `--output-dir PATH` selects another destination.
+
+### Models and targeting rules
+
+Each model family fits three separate purchase classifiers, one for each action.
+Every classifier includes fresh imputation and encoding fitted on its training
+arm only. Validation customers never contribute to their own model fit.
+
+- **Logistic regression:** L2 regularization with `C=1`, the `lbfgs` solver, and
+  at most 2,000 iterations. No class weighting or resampling is applied.
+- **Decision tree:** maximum depth 3 and a minimum of 200 training customers
+  per leaf. This is the single constrained tree comparison.
+
+These are fixed starting configurations, not tuned models. No winner is selected
+and no test data is opened. The implementation follows the scikit-learn
+[logistic regression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html)
+and [decision tree](https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html)
+interfaces.
+
+The four strategy types are:
+
+- **No contact:** assign No Email to everyone.
+- **Random targeting:** choose a reproducible random subset and assign a fixed
+  email type. Both Men's Email and Women's Email are reported, using the same
+  selected customers; neither is chosen based on validation outcomes.
+- **Purchase-probability targeting:** choose each customer's higher predicted
+  email purchase probability, rank by that probability, and contact the top
+  customers within the budget. This response baseline uses the email-arm models.
+- **T-learner targeting:** subtract the predicted No Email purchase probability
+  from each email prediction, choose the larger uplift, and rank customers by
+  that uplift. Only positive predicted uplift is eligible for contact.
+
+Response and uplift targeting share the same fitted arm models, so their
+comparison isolates the difference in ranking rules. The two uplift scores are
+`p_mens - p_no_email` and `p_womens - p_no_email`. They are estimated effects,
+not observed customer-level counterfactual outcomes.
+
+Budgets of 5%, 10%, and 20% apply to both email actions combined. Each validation
+fold is treated as a separate campaign cohort; contact counts are rounded down.
+Ties use reproducible random ordering, and each customer receives at most one
+action. Seven policy variants across three budgets produce 21 comparisons.
+
+### Outputs and how to interpret them
+
+- `predictive_metrics.csv`: out-of-fold average precision, Brier score, and
+  log loss for each observed treatment arm, alongside a training-arm prevalence
+  baseline. These describe response prediction, not uplift accuracy.
+- `policy_comparison.csv`: actual contact rates, email allocations, matched
+  contacted purchases, and exploratory incremental-conversion estimates.
+- `policy_by_fold.csv`: fold-level counts and incremental estimates.
+- `oof_predictions.csv` and `policy_assignments.csv`: predictions and decisions
+  indexed by source row, enabling later paired comparisons.
+- `logistic_coefficients.csv` and `tree_action_0.txt` through `tree_action_2.txt`:
+  interpretable coefficients and rules from models refitted on all development
+  data. Numeric coefficients refer to standardized inputs; arm-specific
+  coefficients are predictive associations, not individual causal effects.
+- `logistic_development_model.joblib` and `tree_development_model.joblib`:
+  refitted candidate models, not the fold models used to calculate validation
+  results. Load with `code/models` on the Python import path so `baselines` can
+  be imported; use the library versions recorded in `experiment.json`.
+- `experiment.json`: settings, assumptions, software versions, and limitations.
+
+Aggregate results and interpretation files can be committed. Model binaries and
+per-customer exports are reproducible local artifacts ignored by Git.
+
+The initial policy comparison uses inverse-probability weighting (IPW), assuming
+balanced random assignment with probability 1/3 for each action. Assignment
+probabilities are distinct from predicted purchase probabilities. For each
+validation customer, the policy score is `1[observed action = recommended
+ action] * conversion / assignment probability`. The no-contact score uses the
+same calculation for No Email. Their paired difference estimates incremental
+conversions; customers who are not contacted cancel exactly. Summing these
+scores estimates incremental conversions across the development cohorts.
+The approach follows the distinction between policy value and differences in
+policy value described in the
+[Stanford policy evaluation tutorial](https://bookdown.org/stanfordgsbsilab/ml-ci-tutorial/policy-evaluation-i---binary-treatment.html).
+
+These are **development-only point estimates**, not final test results or proof
+that a strategy is better. There are only 463 development purchases, random
+selection uses one seeded ranking per fold, and confidence intervals, repeated
+random baselines, and training stability have not yet been implemented. Step 4
+should add paired uncertainty analysis and finalize the evaluation protocol
+before opening test outcomes. Initial descriptive EDA used all records.
+X-learner and ensemble models remain future comparisons; neither is assumed to
+outperform the baselines.
+
 ## Remaining implementation
 
 - [ ] Establish a reproducible environment, dependency versions, and experiment configurations.
 - [x] Build reusable data preparation with held-out splits and training-only preprocessing.
 - [ ] Select a cluster count, fit customer segments, and profile their treatment responses after clustering.
-- [ ] Train a purchase-probability baseline (called the propensity baseline in the presentation).
-- [ ] Implement T-Learner, X-Learner, and ensemble uplift models for each email treatment versus control.
-- [ ] Implement customer selection and treatment recommendations at 5%, 10%, and 20% contact limits.
+- [x] Train purchase-probability baselines with regularized logistic regression and a constrained tree.
+- [x] Implement T-learner baselines for each email treatment versus control.
+- [ ] Compare X-learner and ensemble uplift models after the baseline experiment.
+- [x] Implement customer selection and treatment recommendations at 5%, 10%, and 20% contact limits.
 - [ ] Evaluate estimated incremental conversions and compare targeting methods on held-out data.
 - [ ] Repeat data splits and model configurations to measure ranking stability and treatment recommendation agreement.
 - [ ] Generate multi-step campaign messages from selected customer profiles and model recommendations, then evaluate relevance, factual grounding, and treatment alignment.

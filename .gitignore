@@ -10,3 +10,8 @@ __pycache__/
 /datasets/processed/development.csv
 /datasets/processed/test.csv
 /datasets/processed/development_folds.csv
+
+# Reproducible baseline models and per-customer development outputs.
+/results/baselines/*.joblib
+/results/baselines/oof_predictions.csv
+/results/baselines/policy_assignments.csv

@@ -1,0 +1,23 @@
+Mens E-Mail
+|--- numeric__history <= -0.07
+|   |--- categorical__channel_Phone <= 0.50
+|   |   |--- numeric__recency <= 1.06
+|   |   |   |--- weights: [4060.00, 37.00] class: 0
+|   |   |--- numeric__recency >  1.06
+|   |   |   |--- weights: [1370.00, 22.00] class: 0
+|   |--- categorical__channel_Phone >  0.50
+|   |   |--- numeric__recency <= 1.06
+|   |   |   |--- weights: [3819.00, 36.00] class: 0
+|   |   |--- numeric__recency >  1.06
+|   |   |   |--- weights: [1270.00, 4.00] class: 0
+|--- numeric__history >  -0.07
+|   |--- categorical__zip_code_Rural <= 0.50
+|   |   |--- numeric__history <= 2.13
+|   |   |   |--- weights: [4732.00, 86.00] class: 0
+|   |   |--- numeric__history >  2.13
+|   |   |   |--- weights: [636.00, 20.00] class: 0
+|   |--- categorical__zip_code_Rural >  0.50
+|   |   |--- numeric__history <= 0.29
+|   |   |   |--- weights: [311.00, 6.00] class: 0
+|   |   |--- numeric__history >  0.29
+|   |   |   |--- weights: [634.00, 3.00] class: 0

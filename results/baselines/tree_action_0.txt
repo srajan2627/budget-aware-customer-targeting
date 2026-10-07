@@ -1,0 +1,23 @@
+No E-Mail
+|--- numeric__recency <= -0.64
+|   |--- numeric__history <= -0.23
+|   |   |--- binary__mens <= 0.50
+|   |   |   |--- weights: [1274.00, 10.00] class: 0
+|   |   |--- binary__mens >  0.50
+|   |   |   |--- weights: [1330.00, 2.00] class: 0
+|   |--- numeric__history >  -0.23
+|   |   |--- binary__newbie <= 0.50
+|   |   |   |--- weights: [1394.00, 27.00] class: 0
+|   |   |--- binary__newbie >  0.50
+|   |   |   |--- weights: [1889.00, 15.00] class: 0
+|--- numeric__recency >  -0.64
+|   |--- binary__newbie <= 0.50
+|   |   |--- numeric__history <= -0.83
+|   |   |   |--- weights: [814.00, 9.00] class: 0
+|   |   |--- numeric__history >  -0.83
+|   |   |   |--- weights: [4923.00, 23.00] class: 0
+|   |--- binary__newbie >  0.50
+|   |   |--- numeric__history <= 0.17
+|   |   |   |--- weights: [3957.00, 4.00] class: 0
+|   |   |--- numeric__history >  0.17
+|   |   |   |--- weights: [1366.00, 8.00] class: 0

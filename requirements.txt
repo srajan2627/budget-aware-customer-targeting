@@ -1,5 +1,6 @@
-# Dependencies for loading Hillstrom and creating development/test splits.
+# Dependencies for data preparation and baseline modeling.
 numpy
 pandas
 scikit-learn
 scikit-uplift
+joblib

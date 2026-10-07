@@ -1,0 +1,23 @@
+Womens E-Mail
+|--- numeric__history <= 1.09
+|   |--- binary__womens <= 0.50
+|   |   |--- numeric__recency <= -0.08
+|   |   |   |--- weights: [3238.00, 23.00] class: 0
+|   |   |--- numeric__recency >  -0.08
+|   |   |   |--- weights: [3802.00, 13.00] class: 0
+|   |--- binary__womens >  0.50
+|   |   |--- numeric__recency <= -0.93
+|   |   |   |--- weights: [1802.00, 26.00] class: 0
+|   |   |--- numeric__recency >  -0.93
+|   |   |   |--- weights: [6173.00, 54.00] class: 0
+|--- numeric__history >  1.09
+|   |--- numeric__recency <= -0.36
+|   |   |--- numeric__history <= 1.33
+|   |   |   |--- weights: [248.00, 9.00] class: 0
+|   |   |--- numeric__history >  1.33
+|   |   |   |--- weights: [1101.00, 21.00] class: 0
+|   |--- numeric__recency >  -0.36
+|   |   |--- numeric__history <= 1.90
+|   |   |   |--- weights: [397.00, 2.00] class: 0
+|   |   |--- numeric__history >  1.90
+|   |   |   |--- weights: [197.00, 3.00] class: 0

@@ -1,0 +1,40 @@
+{
+  "evaluation": "development out-of-fold only; not final test performance",
+  "initial_eda": "Used all records before the test split was frozen.",
+  "seed": 42,
+  "budgets": [
+    0.05,
+    0.1,
+    0.2
+  ],
+  "actions": [
+    "No E-Mail",
+    "Mens E-Mail",
+    "Womens E-Mail"
+  ],
+  "assignment_probabilities": [
+    0.3333333333333333,
+    0.3333333333333333,
+    0.3333333333333333
+  ],
+  "assignment_assumption": "Equal randomized allocation to three arms.",
+  "logistic": {
+    "C": 1.0,
+    "solver": "lbfgs",
+    "max_iter": 2000,
+    "class_weight": null
+  },
+  "tree": {
+    "max_depth": 3,
+    "min_samples_leaf": 200,
+    "random_state": 42,
+    "class_weight": null
+  },
+  "tuning": "Fixed starting settings; no hyperparameter search or winner selection.",
+  "versions": {
+    "sklearn": "1.9.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6"
+  },
+  "limitations": "IPW point estimates only; no confidence intervals or stability analysis. One fixed random ranking per fold. Rare purchases make estimates noisy."
+}
