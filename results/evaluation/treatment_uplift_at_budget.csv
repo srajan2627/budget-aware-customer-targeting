@@ -1,0 +1,13 @@
+model,email,budget,comparison_customers,selected,selected_fraction,selected_treatment_customers,selected_control_customers,selected_treatment_purchases,selected_control_purchases,estimated_incremental_conversions,ci_lower,ci_upper
+logistic,Mens E-Mail,0.05,8522,426,0.049988265665336776,209,217,5,3,4.0,-6.0,16.0
+logistic,Mens E-Mail,0.1,8522,852,0.09997653133067355,426,426,13,4,18.0,2.0,34.0
+logistic,Mens E-Mail,0.2,8522,1704,0.1999530626613471,835,869,18,5,26.0,6.0,44.0
+logistic,Womens E-Mail,0.05,8539,426,0.04988874575477222,196,230,2,2,0.0,-8.0,8.0
+logistic,Womens E-Mail,0.1,8539,853,0.09989460124136315,404,449,4,2,4.0,-6.0,14.0
+logistic,Womens E-Mail,0.2,8539,1707,0.19990631221454502,822,885,11,7,8.0,-8.0,26.0
+tree,Mens E-Mail,0.05,8522,426,0.049988265665336776,214,212,4,2,4.0,-6.0,14.0
+tree,Mens E-Mail,0.1,8522,852,0.09997653133067355,440,412,5,2,6.0,-4.0,16.0
+tree,Mens E-Mail,0.2,8522,1704,0.1999530626613471,846,858,12,4,16.0,0.0,32.0
+tree,Womens E-Mail,0.05,8539,426,0.04988874575477222,212,214,5,2,6.0,-4.0,16.0
+tree,Womens E-Mail,0.1,8539,853,0.09989460124136315,434,419,9,5,8.0,-6.0,24.0
+tree,Womens E-Mail,0.2,8539,1707,0.19990631221454502,864,843,15,6,18.0,0.0,36.0

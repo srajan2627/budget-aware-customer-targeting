@@ -1,4 +1,4 @@
-"""Exploratory IPW point estimates on randomized development validation data."""
+"""IPW scores for randomized three-action policy evaluation."""
 import numpy as np
 
 
@@ -25,3 +25,32 @@ def policy_scores(observed_actions, outcomes, recommended_actions, propensities)
     value = (a == pi) * y / e[a]
     control = (a == 0) * y / e[0]
     return value, value - control
+
+
+def paired_bootstrap_totals(scores, *, repeats=2000, seed=2026):
+    """Bootstrap fixed-policy totals with identical row draws for every column.
+
+    The estimand is n * mean(score). Policies and rankings stay frozen: this
+    measures evaluation-sample uncertainty, not training or reranking variation.
+    Do not stratify on conversion: preserving purchase counts would suppress
+    precisely the uncertainty we need to measure. Batch draws bound memory.
+    """
+    s = np.asarray(scores, dtype=float)
+    if s.ndim == 1:
+        s = s[:, None]
+    if s.ndim != 2 or not len(s) or not np.isfinite(s).all():
+        raise ValueError('Require a finite, nonempty score matrix.')
+    if not isinstance(repeats, int) or repeats < 2:
+        raise ValueError('Require at least two bootstrap replicates.')
+    rng = np.random.default_rng(seed)
+    totals = np.empty((repeats, s.shape[1]))
+    for start in range(0, repeats, 32):
+        size = min(32, repeats - start)
+        counts = rng.multinomial(len(s), np.full(len(s), 1 / len(s)), size=size)
+        totals[start:start + size] = counts @ s
+    return totals
+
+
+def interval(samples):
+    """Pointwise percentile 95% interval; no multiplicity adjustment."""
+    return tuple(float(x) for x in np.quantile(samples, [.025, .975]))

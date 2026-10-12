@@ -1,0 +1,52 @@
+{
+  "config_sha256": "3f9170a2e2fe6d9b7cf6884f5d3b93ef3f95c76a7630fb35a7377f36409d1b20",
+  "development_sha256": "f12811d038a960f4a03bd6e0715f70793aed03dc40f630101132a243849c353e",
+  "test_sha256": "d9119ccbdd19c7cb7a993a2e7f9c97635fefd1fb48046a25bfc9a2169046afef",
+  "code_sha256": {
+    "code/data/development_cv.py": "d896ac2a0be4145d62f18be400e0472b882193da0c627134fcf41c7c2acbd786",
+    "code/data/load_hillstrom.py": "a9b9271a35a2de9a2c5a3344d96286c7660a76f243c55cdea36ed830e481c510",
+    "code/data/preprocessing.py": "e7f1ddc089beeb92f2c04b8d1c91cb92c92175d5d36f1de925ef6b9a070a10eb",
+    "code/data/split_data.py": "002e3c6a10b9f76d426d80551550dd11e6be941cc257be64ec06118ec17fbd42",
+    "code/evaluation/plot_results.py": "8468b557d1152c14ab7172728b5f6c655122db8fe8201d061ee0508d1b5db702",
+    "code/evaluation/policy_value.py": "1739b401d5a3cf8b0f899b934d9bfebb231de014fa937c32e3e33866762780cc",
+    "code/evaluation/reliability.py": "afb12ffb168ab2f1846c72226c3f025d95edab0c2a73d89068eddbd76097e256",
+    "code/evaluation/run_evaluation.py": "a6cebd8181e1f15d19fad9df17589f3b0f7a17c36d2b79fd55eb6a1a0feb714f",
+    "code/genai/messages.py": "fde5ebc29a80c922cfc52e1f032415543493a9e19d7801d424ad2758a008cb98",
+    "code/models/baselines.py": "b3f11e3decfda2c98163989e33368af948d609afa6d4e5a7be99365b6fea7c1a",
+    "code/models/run_baselines.py": "79a8474665044e89e5a49dd14f051c6cd553f4649f8c28879f787a79ea523c98",
+    "code/reporting/build_report5.py": "298cde8ce6d81ffc7d241e528e24e268d529b270d5776ebb70121ebf8da585d3",
+    "code/segmentation/clusters.py": "26aaae3e63f342aa7292ee3c961f8f9423328ac708601bfae1bcc3ceda0679ce",
+    "code/targeting/policies.py": "dcc5b518325ae341cb5586e2aed6b606b415afc71f0a5e401b2f4a3ed3f75368"
+  },
+  "customers": 12800,
+  "purchases": 115,
+  "selected_k": 2,
+  "test_arm_counts": {
+    "Mens E-Mail": 4261,
+    "No E-Mail": 4261,
+    "Womens E-Mail": 4278
+  },
+  "test_arm_purchases": {
+    "Mens E-Mail": 53,
+    "No E-Mail": 24,
+    "Womens E-Mail": 38
+  },
+  "versions": {
+    "python": "3.14.2",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "sklearn": "1.9.1",
+    "sklift": "0.5.1",
+    "joblib": "1.6.0"
+  },
+  "limitations": [
+    "Prior full-data descriptive EDA; test is not historically untouched.",
+    "Outcome-stratified initial split; bootstrap intervals are approximate population inference, not exact design-based inference.",
+    "Only 115 test purchases. Pointwise intervals, multiple comparisons, no deployment winner chosen.",
+    "Fixed-policy evaluation bootstrap excludes training and reranking uncertainty; refit ranges are reported separately.",
+    "Cluster ablation is exploratory development OOF; global k chosen on development attributes, so not fully nested model selection.",
+    "Equal assignment probabilities 1/3 are supported by dataset documentation; no observational propensity fitting.",
+    "Generated messages and multiple-touch sequences were never randomized in Hillstrom."
+  ],
+  "code_snapshot_note": "Numerical-analysis source hashes were recorded by the evaluator. The report-authoring hash was refreshed after final document layout corrections; numerical-analysis source and numeric results are unchanged."
+}

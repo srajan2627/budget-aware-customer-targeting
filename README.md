@@ -12,10 +12,12 @@ A purchase-probability model ranks customers by their likelihood of buying. Upli
 
 ## Current status
 
-**EDA, data preparation, and the first baseline comparison are complete.** Regularized logistic regression and a constrained decision tree have been evaluated using the same five development folds. Response and T-learner policies are compared with no contact and fixed-email random targeting. Final test evaluation, uncertainty analysis, customer clustering, and generative campaigns remain pending.
+**Steps 4 and 5 now have held-out evaluation and measured reliability. Step 6 includes customer segmentation and grounded GenAI drafts.** Both fixed baseline model families were refitted on development data and evaluated on the same 12,800 test customers. Paired confidence intervals, 100 random baseline rankings, and 20 training resamples per family are available. Clusters remain explanatory because the development ablation showed no targeting improvement. Message drafts have limited automated audits; independent message review and a new conversion experiment remain pending.
 
 - [Initial Hillstrom exploration notebook](code/EDA/631_InitialHillstromExploration.ipynb)
 - [Project progress presentation](docs/presentations/CIS631_Project_Progress_Report.pptx)
+- [Progress report 5 with methods, results, and interpretation](docs/Progress_Reports/Progress_Report_5.docx)
+- [Evaluation output guide](results/evaluation/README.md)
 
 ## Research questions
 
@@ -168,8 +170,8 @@ transformers. For model selection, place a fresh transformer and the estimator
 in a scikit-learn `Pipeline`, then pass the raw development features and
 `cv=make_development_folds(development_df)` to cross-validation or grid search.
 This lets each fold learn its own medians, modes, scaling statistics, and
-category vocabulary. Refit the selected pipeline on all development data only
-after model selection, then use it for the final test comparison.
+category vocabulary. Refit fixed candidates on all development data only
+after freezing the comparison, then use them for the final test evaluation.
 
 The tests check missing and unseen values, feature exclusion, unchanged fitted
 statistics after held-out transformation, reproducible fold membership, and
@@ -275,19 +277,92 @@ before opening test outcomes. Initial descriptive EDA used all records.
 X-learner and ensemble models remain future comparisons; neither is assumed to
 outperform the baselines.
 
+## Steps 4 through 6 Held-out decisions and reliability
+
+With the existing development/test exports and project environment active:
+
+```bash
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python code/evaluation/run_evaluation.py
+python code/genai/messages.py
+python code/evaluation/plot_results.py
+python -m unittest discover -s tests -v
+```
+
+The runner uses [the fixed evaluation protocol](configs/evaluation.json), writes
+it before loading test outcomes, chooses clusters and runs the cluster ablation
+on development data, and then evaluates both fixed Step 3 model families.
+No winner or hyperparameter is selected using test outcomes. All results are
+written to `results/evaluation`; rerunning replaces reproducible outputs.
+The same fixed customers and source-row order are used for all strategies and
+training refits. Do not tune future models against these now-observed test results.
+
+At 5%, 10%, and 20%, logistic uplift estimates **6 [-12, 24]**, **24 [0, 48]**,
+and **36 [9, 66]** additional conversions versus No Email. Tree uplift estimates
+**9 [-9, 27]**, **12 [-6, 33]**, and **27 [3, 54]**. Brackets give pointwise
+95% paired test-bootstrap intervals. Every contacting policy selected exactly
+640, 1,280, or 2,560 customers: 5%, 10%, or 20% **across both emails combined**.
+The positive-uplift eligibility rule can leave budget unused in other data.
+
+Neither uplift policy has a clearly positive paired difference from the mean
+random Men's Email baseline at any budget. Logistic response estimates 21,
+33, and 51 additional conversions, with positive pointwise differences from
+the mean random Men's policy, but sparse purchases and multiple comparisons
+limit the conclusion. Predicting no purchase for everyone achieves 99.10%
+test accuracy and is not a useful decision metric.
+
+Selection is unstable across development bootstraps: logistic uplift shares
+33.6%, 42.5%, and 45.3% of selected customers between refit pairs; tree uplift
+shares 15.5%, 20.2%, and 32.8%. These are means across 190 dependent refit pairs
+for each budget. Agreement on the email among shared selections is reported
+separately from selection overlap. Test bootstrap intervals keep the policy
+fixed; training-refit performance spreads are a distinct source of variation.
+
+The two selected clusters primarily distinguish past Women's merchandise
+purchases (sometimes both categories) from past Men's merchandise purchases
+without Women's purchases. They describe purchase behavior, **not gender**.
+Adding cluster membership to logistic uplift changes development estimates
+by -3, 0, and -9 conversions at the three budgets, with no demonstrated benefit.
+Cluster choice uses only development attributes; fresh clustering is fitted
+inside each ablation fold. The global development choice of k means the
+ablation is exploratory rather than fully nested selection.
+
+The GenAI prototype contains nine Codex-authored draft messages for three
+actual selected profiles, reusable prompts, a generator-callable interface,
+fact ledgers, and content audits. All nine pass the limited checks. Independent
+human review is pending, and these checks do not prove semantic grounding or
+conversion improvement. Only the first stage corresponds to the evaluated
+single-email policy; follow-up drafts are unsent sequence concepts requiring
+a new experiment and total-contact budget.
+
+- [Held-out policy value and confidence intervals](results/figures/heldout_policy_value.png)
+- [Targeting reliability across training samples](results/figures/targeting_reliability.png)
+- [Grounded drafts](results/evaluation/message_drafts.json)
+- [Message review rubric and limitations](docs/research/message_review_rubric.md)
+
+The observed Python 3.14 environment is pinned in
+[requirements-evaluation.txt](requirements-evaluation.txt). A fresh-environment
+installation has not been independently verified. Experiment metadata records
+library versions and code/data/config hashes. The document builder in
+`code/reporting/build_report5.py` uses Report 4 as its retained template and
+requires `lxml` in a document-authoring environment; document layout is verified
+using the bundled Documents renderer. No GitHub commit or push was performed.
+
 ## Remaining implementation
 
-- [ ] Establish a reproducible environment, dependency versions, and experiment configurations.
+- [x] Record dependency versions, code/data hashes, and fixed experiment configurations.
+- [ ] Verify installation in a fresh environment.
 - [x] Build reusable data preparation with held-out splits and training-only preprocessing.
-- [ ] Select a cluster count, fit customer segments, and profile their treatment responses after clustering.
+- [x] Compare cluster counts, fit training-only segments, and profile treatment responses with counts and uncertainty.
 - [x] Train purchase-probability baselines with regularized logistic regression and a constrained tree.
 - [x] Implement T-learner baselines for each email treatment versus control.
 - [ ] Compare X-learner and ensemble uplift models after the baseline experiment.
 - [x] Implement customer selection and treatment recommendations at 5%, 10%, and 20% contact limits.
-- [ ] Evaluate estimated incremental conversions and compare targeting methods on held-out data.
-- [ ] Repeat data splits and model configurations to measure ranking stability and treatment recommendation agreement.
-- [ ] Generate multi-step campaign messages from selected customer profiles and model recommendations, then evaluate relevance, factual grounding, and treatment alignment.
-- [ ] Add automated checks and export experiment tables, figures, and final research findings.
+- [x] Evaluate incremental conversions, actual contact fractions, and paired baseline differences on held-out randomized data.
+- [x] Refit on different development samples and score fixed customers to measure selection and treatment stability.
+- [x] Generate grounded campaign drafts and implement relevance, declared-fact, and treatment-alignment checks.
+- [ ] Collect independent message-quality ratings and evaluate new copy/sequences in a new randomized study.
+- [x] Add automated checks and export result tables, figures, and progress report 5.
+- [ ] Add doubly robust evaluation as a separately validated extension.
 
 ## Scope and limitations
 

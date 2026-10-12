@@ -1,0 +1,10 @@
+source_row,stage,declared_facts_match,category_alignment,relevant_attribute_declared,prohibited_claim_flag,content_checks_pass,policy_compatible_single_contact,independent_human_review
+37,1,True,True,True,False,True,True,pending
+37,2,True,True,True,False,True,False,pending
+37,3,True,True,True,False,True,False,pending
+69,1,True,True,True,False,True,True,pending
+69,2,True,True,True,False,True,False,pending
+69,3,True,True,True,False,True,False,pending
+231,1,True,True,True,False,True,True,pending
+231,2,True,True,True,False,True,False,pending
+231,3,True,True,True,False,True,False,pending

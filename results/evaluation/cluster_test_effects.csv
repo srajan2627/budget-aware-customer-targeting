@@ -1,0 +1,5 @@
+cluster,email,cluster_customers,estimated_incremental_conversions_all_in_cluster,ci_lower,ci_upper
+0,Mens E-Mail,7139,54.0,15.0,93.0
+0,Womens E-Mail,7139,39.0,3.0,78.0
+1,Mens E-Mail,5661,33.0,-3.0,69.0
+1,Womens E-Mail,5661,3.0,-24.074999999999996,30.0

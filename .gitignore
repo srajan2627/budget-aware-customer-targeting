@@ -15,3 +15,8 @@ __pycache__/
 /results/baselines/*.joblib
 /results/baselines/oof_predictions.csv
 /results/baselines/policy_assignments.csv
+
+# Reproducible held-out models and per-customer artifacts.
+/results/evaluation/*.joblib
+/results/evaluation/test_assignments.csv
+/results/evaluation/test_predictions.csv

@@ -1,0 +1,29 @@
+{
+  "budgets": [
+    0.05,
+    0.1,
+    0.2
+  ],
+  "assignment_probabilities": [
+    0.3333333333333333,
+    0.3333333333333333,
+    0.3333333333333333
+  ],
+  "bootstrap_repeats": 2000,
+  "training_refits": 20,
+  "random_rankings": 100,
+  "cluster_stability_refits": 5,
+  "seed": 2026,
+  "policy_tie_seed": 42,
+  "models": [
+    "logistic",
+    "tree"
+  ],
+  "model_selection": "Evaluate both fixed Step 3 families; no winner or hyperparameter selected from test outcomes.",
+  "intervals": "Paired ordinary customer bootstrap, fixed recommendations, percentile pointwise 95 percent intervals; no multiplicity correction.",
+  "training_resampling": "Bootstrap within action arms only, same samples for both model families; score fixed evaluation customers and hold policy tie seed constant.",
+  "random_baselines": "Average 100 seeded random rankings; both email types share selected customers. Report allocation variation separately.",
+  "cluster_selection": "k in 2,3,4,5; maximize development-attribute silhouette among minimum-size >=5 percent and mean bootstrap ARI >=0.75; mark fallback if none eligible.",
+  "cluster_ablation": "Development folds only; fit fresh clustering on each fold training rows; compare logistic uplift with and without one-hot cluster membership.",
+  "genai": "Grounded draft messages and explicit content audit only; no conversion lift claim. No second email is authorized by a single-contact policy."
+}

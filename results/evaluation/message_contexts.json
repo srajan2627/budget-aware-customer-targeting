@@ -1,0 +1,41 @@
+[
+  {
+    "recency": 4,
+    "history": 766.47,
+    "mens": 1,
+    "womens": 1,
+    "newbie": 1,
+    "zip_code": "Urban",
+    "channel": "Multichannel",
+    "source_row": 37,
+    "cluster": 0,
+    "recommended_action": "Mens E-Mail",
+    "estimated_uplift": 0.015433238865027621
+  },
+  {
+    "recency": 10,
+    "history": 1009.44,
+    "mens": 1,
+    "womens": 0,
+    "newbie": 1,
+    "zip_code": "Suburban",
+    "channel": "Multichannel",
+    "source_row": 69,
+    "cluster": 1,
+    "recommended_action": "Mens E-Mail",
+    "estimated_uplift": 0.01071217513669394
+  },
+  {
+    "recency": 2,
+    "history": 591.95,
+    "mens": 0,
+    "womens": 1,
+    "newbie": 1,
+    "zip_code": "Urban",
+    "channel": "Multichannel",
+    "source_row": 231,
+    "cluster": 0,
+    "recommended_action": "Womens E-Mail",
+    "estimated_uplift": 0.011696382929790562
+  }
+]

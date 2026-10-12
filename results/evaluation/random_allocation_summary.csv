@@ -1,0 +1,7 @@
+policy,budget,allocation_mean,allocation_sd,allocation_p05,allocation_p95
+random_mens_mean,0.05,3.99,5.411351704770932,-6.0,12.0
+random_mens_mean,0.1,7.77,7.652628781845312,-3.1499999999999995,21.0
+random_mens_mean,0.2,17.43,11.721735831739721,0.0,36.0
+random_womens_mean,0.05,1.95,5.3661396315651855,-6.0,12.0
+random_womens_mean,0.1,3.27,6.810353081221934,-6.0,15.0
+random_womens_mean,0.2,8.25,9.129124223654156,-6.0,24.0

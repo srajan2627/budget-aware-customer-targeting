@@ -1,0 +1,5 @@
+cohort,cluster,customers,fraction,recency_median,history_median,mens_past_purchase,womens_past_purchase,newbie_fraction,most_common_channel,most_common_zip_class
+development,0,28043,0.54771484375,5.0,184.23,0.18268373569161644,1.0,0.5130335556110259,Web,Suburban
+development,1,23157,0.45228515625,6.0,136.09,1.0,0.0,0.4898302888975256,Web,Suburban
+test,0,7139,0.557734375,5.0,179.53,0.18560022412102536,1.0,0.507494046785264,Phone,Suburban
+test,1,5661,0.442265625,6.0,134.41,1.0,0.0,0.4930224341989048,Web,Suburban
