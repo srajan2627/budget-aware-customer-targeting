@@ -654,8 +654,12 @@ To rebuild the report with the optional `lxml` authoring dependency:
 python code/reporting/build_report8.py
 ```
 
-Report 8 retains Report 7's formatting and explains the new findings in plain
-language. Its three pages were rendered and visually checked. Eight new tests
+Report 8 retains Report 7's formatting and stands alone as the final progress
+checkpoint: it explains the completed workflow, original targeting results,
+new reliability findings, segmentation, current GenAI prototype, and remaining
+deliverables. Planned generator integration and independent message review are
+clearly separated from completed work. Its three pages were rendered and visually
+checked, meeting the three-page maximum. Eight new tests
 cover exact small-case references, nested paired samples, sparse diagnostics,
 bootstrap compression and Monte Carlo intervals, bringing the total to 26.
 All numeric experiments were repeated and compared for reproducibility.
