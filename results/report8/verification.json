@@ -29,8 +29,9 @@
   "report_pages_visually_checked": 3,
   "new_figures_visually_checked": 4,
   "retained_report7_sha256": "2044f1647c572398959c16c51e7616aeb9a18762b8eaf20f76c1ef9d66458fcf",
-  "report8_sha256": "e76a6091549bf5bc668cd798f53f927facdc120aa84926d273a97069a45fb4dc",
+  "report8_sha256": "15edca4649386e345b4958f6a07fcddbc944b328954b060447d249ded108f528",
   "document_preserve_only_parts_unchanged": true,
   "document_page_geometry_unchanged": true,
-  "original_campaign_point_estimates_reproduced": true
+  "original_campaign_point_estimates_reproduced": true,
+  "report8_genai_next_steps_added_and_visually_checked": true
 }
