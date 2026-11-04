@@ -1,0 +1,48 @@
+{
+  "protocol_sha256": "e713962edddd96aa4b323acd7794b45f5a3ab0fd697bd3ea9920291e87168cc1",
+  "inputs_and_analysis_sha256": {
+    "code/data/development_cv.py": "d896ac2a0be4145d62f18be400e0472b882193da0c627134fcf41c7c2acbd786",
+    "code/data/load_hillstrom.py": "a9b9271a35a2de9a2c5a3344d96286c7660a76f243c55cdea36ed830e481c510",
+    "code/data/preprocessing.py": "e7f1ddc089beeb92f2c04b8d1c91cb92c92175d5d36f1de925ef6b9a070a10eb",
+    "code/data/split_data.py": "002e3c6a10b9f76d426d80551550dd11e6be941cc257be64ec06118ec17fbd42",
+    "code/evaluation/plot_report8.py": "25cbd329dab5836f21df6818737514a0f87515618a377fd8ad9dff6bdc4959a3",
+    "code/evaluation/plot_results.py": "8468b557d1152c14ab7172728b5f6c655122db8fe8201d061ee0508d1b5db702",
+    "code/evaluation/policy_value.py": "1739b401d5a3cf8b0f899b934d9bfebb231de014fa937c32e3e33866762780cc",
+    "code/evaluation/reliability.py": "afb12ffb168ab2f1846c72226c3f025d95edab0c2a73d89068eddbd76097e256",
+    "code/evaluation/report8_methods.py": "09816444d5c2798b6eeca0b3fdcd0fb90180f36511efa8d34ff78a985691834c",
+    "code/evaluation/run_evaluation.py": "a6cebd8181e1f15d19fad9df17589f3b0f7a17c36d2b79fd55eb6a1a0feb714f",
+    "code/evaluation/run_report8.py": "34f005d2139c1974763c1f0a109036428876b0fc3184c2d470a0129810c8e231",
+    "code/genai/messages.py": "fde5ebc29a80c922cfc52e1f032415543493a9e19d7801d424ad2758a008cb98",
+    "code/models/baselines.py": "b3f11e3decfda2c98163989e33368af948d609afa6d4e5a7be99365b6fea7c1a",
+    "code/models/run_baselines.py": "79a8474665044e89e5a49dd14f051c6cd553f4649f8c28879f787a79ea523c98",
+    "code/segmentation/clusters.py": "26aaae3e63f342aa7292ee3c961f8f9423328ac708601bfae1bcc3ceda0679ce",
+    "code/targeting/policies.py": "dcc5b518325ae341cb5586e2aed6b606b415afc71f0a5e401b2f4a3ed3f75368",
+    "configs/report8.json": "e713962edddd96aa4b323acd7794b45f5a3ab0fd697bd3ea9920291e87168cc1",
+    "datasets/processed/development.csv": "f12811d038a960f4a03bd6e0715f70793aed03dc40f630101132a243849c353e",
+    "datasets/processed/test.csv": "d9119ccbdd19c7cb7a993a2e7f9c97635fefd1fb48046a25bfc9a2169046afef",
+    "results/evaluation/reliability_pairs.csv": "cd7c3fa1be9af673f85a16f08db3d75849a2794370d2ef9da4c40b7324f65a89",
+    "results/evaluation/reliability_summary.csv": "2dabcc0cc92fb0a377d85fcb628b6728b8d722a78a7ff05fe1cbfe1972dc97f0"
+  },
+  "versions": {
+    "python": "3.14.2",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "scipy": "1.18.1",
+    "sklearn": "1.9.1"
+  },
+  "development_customers": 51200,
+  "evaluation_customers": 12800,
+  "evaluation_purchases": 115,
+  "limitations": [
+    "Exploratory repeated use of previously inspected Hillstrom evaluation outcomes; no new deployment winner.",
+    "m-out-of-n bootstrap draws with replacement do not create new independent customers.",
+    "Tree minimum leaf size remains 200 at every sample size, so smaller samples also change effective tree complexity.",
+    "190 refit pairs share models and are dependent; reported pair means and refit ranges are descriptive.",
+    "Simulation effects and rates are hypothetical, homogeneous within selections, and not fitted causal truths.",
+    "Simulations validate a fixed-policy estimator under stated assumptions, not learned rankings or external generalization.",
+    "Conservative exact bounds are a reference for iid homogeneous selected populations, not a replacement for heterogeneous policy-difference CIs.",
+    "MDE is the smallest tested effect meeting a Monte Carlo lower-bound criterion, not a continuous or universal detection limit.",
+    "Original percentile intervals can fail in sparse nonempty groups; flagged historical intervals are withheld in this audit.",
+    "Training variability, evaluation uncertainty, and Monte Carlo uncertainty remain separate."
+  ]
+}

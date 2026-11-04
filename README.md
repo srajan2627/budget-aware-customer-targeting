@@ -12,9 +12,24 @@ A purchase-probability model ranks customers by their likelihood of buying. Upli
 
 ## Current status
 
+**November 4, 2026 — Report 8 adds evaluator validation, a chance reference for
+selection overlap, a paired training-size study, and controlled detection-limit
+simulations.** Logistic uplift becomes more consistent as nominal training draw
+counts increase. The simulations expose poor coverage of the original percentile
+interval in sparse settings; two historical nonempty zero-event email components
+are flagged in a separate audit. These are exploratory follow-ups on already
+inspected evaluation data, not a new campaign or a deployment-model selection.
+
+Read [Progress Report 8](docs/Progress_Reports/Progress_Report_8.docx), the
+[detailed research protocol](docs/research/report8_protocol.md), and the
+[Report 8 output guide](results/report8/README.md). The groupmate's submitted
+[Report 7](docs/Progress_Reports/Progress_Report_7.docx) is retained as the report
+template and planning checkpoint. All 26 automated tests pass in the existing
+environment; clean-environment installation remains unverified.
+
 **Steps 4 and 5 now have held-out evaluation and measured reliability. Step 6 includes customer segmentation and grounded GenAI drafts.** Both fixed baseline model families were refitted on development data and evaluated on the same 12,800 test customers. Paired confidence intervals, 100 random baseline rankings, and 20 training resamples per family are available. Clusters remain explanatory because the development ablation showed no targeting improvement. Message drafts have limited automated audits; independent message review and a new conversion experiment remain pending.
 
-Progress through **October 12, 2026**:
+Original workflow completed through **October 12, 2026**:
 
 - **Step 1 — Experimental design:** purchase conversion is the primary outcome;
   visits and spending are secondary recorded outcomes. Actions are Men's Email,
@@ -117,25 +132,26 @@ implemented in the runners documented below.
 │   ├── data/                # Reusable loading, splitting, preprocessing, and CV code
 │   ├── models/              # Baseline response and T-learner models
 │   ├── targeting/           # One combined contact budget across both emails
-│   ├── evaluation/          # IPW, paired uncertainty, reliability, and figures
+│   ├── evaluation/          # IPW, reliability, Report 8 diagnostics, and figures
 │   ├── segmentation/        # Training-fitted clusters and response profiles
 │   ├── genai/               # Grounded prompts, generator interface, and audits
-│   └── reporting/           # Report 5 builder using the retained Report 4 template
+│   └── reporting/           # Report 5 and Report 8 builders and narrative
 ├── configs/                 # Fixed evaluation protocol
 ├── datasets/
 │   ├── raw/                 # Ignored downloaded data cache
 │   └── processed/           # Ignored development/test/fold exports
 ├── docs/
-│   ├── Progress_Reports/    # Reports 2, 4, and 5
+│   ├── Progress_Reports/    # Reports 2, 4, 5, 7, and 8
 │   ├── presentations/       # Project progress presentation
 │   └── research/            # Message review rubric and limitations
 ├── notebooks/               # Reserved for additional exploratory notebooks
 ├── results/
 │   ├── baselines/           # Step 3 development comparisons and interpretation
 │   ├── evaluation/          # Held-out, reliability, cluster, and message outputs
+│   ├── report8/             # Chance, training-size, sparse-event and simulation outputs
 │   ├── figures/             # Exported policy-value and reliability plots
 │   └── tables/              # Reserved for additional experiment summaries
-├── tests/                   # 18 preprocessing, model, policy, and message checks
+├── tests/                   # 26 preprocessing, model, policy, message, and Report 8 checks
 ├── requirements.txt         # Unpinned core data/model dependencies
 ├── requirements-evaluation.txt  # Pinned observed evaluation environment
 └── README.md
@@ -544,6 +560,106 @@ changes, results, and limitations; its retained Report 4 template is unchanged.
 Project progress through Report 5 has been committed and pushed to the
 [GitHub repository](https://github.com/srajan2627/budget-aware-customer-targeting).
 
+## Report 8 Reliability and detection limits
+
+Run from the repository root in the existing environment, with the development
+and evaluation exports already available:
+
+```bash
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python code/evaluation/run_report8.py
+python code/evaluation/plot_report8.py
+python -m unittest discover -s tests -v
+```
+
+The runner freezes [configs/report8.json](configs/report8.json) before computing
+new results and writes to `results/report8`, preserving earlier evaluation
+exports. Both model settings and the tie seed remain fixed. It does not tune
+models against the previously observed evaluation outcomes.
+
+### Evaluator validation and historical audit
+
+We ran 109 parametric fixed-policy scenarios with 1,000 trials each. Evaluation
+sizes are 6,400, 12,800 and 25,600; budgets are 5%, 10% and 20%; hypothetical
+control purchase probabilities are 0.1% and 0.5%; selected-customer benefits
+range from zero to four absolute percentage points. An extra sparse case uses
+122 contacts. No model is trained in these simulations, and no real customer
+attributes are used. They are not external or semi-synthetic validation.
+
+In the sparse case, the true expected benefit is 1.22 extra purchases. The
+original nominal 95% percentile interval covers it in only **44.4%** of trials;
+**45.8%** of trials have zero contributing purchases. The conservative exact
+reference covers it in all 1,000 trials but is wider and much less sensitive.
+Monte Carlo uncertainty is exported; 100% observed coverage is not a guarantee
+across every possible data-generating process.
+
+The separate historical audit identifies two nonempty zero-event Women's Email
+components: 68 recommendations from logistic response at 5%, and 122 from
+logistic uplift at 10%. Their display endpoints are withheld as uninformative;
+their original [0, 0] intervals remain in historical exports for traceability.
+Structural zeros with no selected customers are distinguished. Other nonzero
+intervals are not thereby validated. The simultaneous exact reference is only
+justified for the simulation's homogeneous iid selected-population assumptions,
+and is not installed as a general replacement for heterogeneous policy comparisons.
+
+### Chance context and training-size results
+
+Independent random lists at the same 5%, 10% and 20% budgets have expected
+selection overlaps of 5%, 10% and 20%. Logistic uplift's earlier overlaps of
+33.6%, 42.5% and 45.3% and tree uplift's 15.5%, 20.2% and 32.8% exceed this
+reference. This establishes above-chance consistency, not correct targeting or
+a business standard for acceptable stability. Counts are handled pair by pair;
+10,000 independent random intersections per budget check the analytic reference.
+
+We used 20 paired within-action bootstrap samples at nominal training fractions
+25%, 50%, 75% and 100%, scoring the same evaluation customers. At 20% contact
+budget, logistic uplift overlap rises **29.8%, 37.9%, 42.6%, 45.3%**. Its mean
+estimated extra purchases are **24.75, 28.80, 26.70, 27.45**: consistency improves,
+but value does not increase steadily. Tree overlap is **29.0%, 29.6%, 35.2%,
+32.8%**, and mean values are **22.05, 17.70, 21.45, 15.30**. No winner is chosen.
+
+These are bootstrap draw counts, not new independent customers. The full-size
+draw averages about 32,359 unique source records; the smaller counts are rounded
+within action arms. Refits are paired across models and training sizes. The
+190 pairs share models and are dependent, and descriptive refit spreads are
+not confidence intervals. The tree's minimum leaf size remains 200 at every
+training size, changing its effective flexibility. Full-size results reproduce
+the earlier reliability study.
+
+### Conditional detection limits
+
+Detection means a lower endpoint above zero for a two-sided 95% interval. The
+grid threshold is the smallest tested benefit whose Wilson 95% Monte Carlo
+lower bound on detection reaches 80%, using the conservative reference. It is
+a method-specific sufficient grid threshold, not a universal minimum effect.
+
+At 12,800 evaluation customers and a hypothetical 0.5% control purchase chance,
+the threshold is not reached on the tested grid at 5% or 10% budget. At 20%,
+the smallest qualifying tested benefit is **four percentage points** among
+selected customers: detection is **99.5%** (Monte Carlo interval approximately
+98.8%–99.8%). At +2 points, detection is 57.3%. With 25,600 evaluation customers
+and the same 20% budget it is 96.7%, but the number of contacts doubles too.
+This is not a fixed-contact comparison or a prediction of real campaign success.
+Power for differences between learned strategies has not been established.
+
+New figures:
+
+- [Selection overlap compared with chance](results/figures/report8_chance_reference.png)
+- [Training-size consistency and value](results/figures/report8_training_size.png)
+- [Known-truth interval coverage](results/figures/report8_interval_coverage.png)
+- [Conditional detection curves](results/figures/report8_detection_limits.png)
+
+To rebuild the report with the optional `lxml` authoring dependency:
+
+```bash
+python code/reporting/build_report8.py
+```
+
+Report 8 retains Report 7's formatting and explains the new findings in plain
+language. Its three pages were rendered and visually checked. Eight new tests
+cover exact small-case references, nested paired samples, sparse diagnostics,
+bootstrap compression and Monte Carlo intervals, bringing the total to 26.
+All numeric experiments were repeated and compared for reproducibility.
+
 ## Remaining implementation
 
 - [x] Record dependency versions, code/data hashes, and fixed experiment configurations.
@@ -560,6 +676,10 @@ Project progress through Report 5 has been committed and pushed to the
 - [ ] Collect independent message-quality ratings and evaluate new copy/sequences in a new randomized study.
 - [x] Add automated checks and export result tables, figures, and progress report 5.
 - [ ] Add doubly robust evaluation as a separately validated extension.
+- [x] Add a selection-stability chance reference and paired training-size study.
+- [x] Validate fixed-policy evaluation and conditional detection through known-truth simulations.
+- [ ] Validate suitable sparse-outcome intervals for general heterogeneous policy comparisons.
+- [ ] Compare visit and spending targeting as separate secondary-outcome analyses.
 
 ## Scope and limitations
 
@@ -571,6 +691,10 @@ intervals are approximate after treatment-by-conversion stratification, are
 pointwise rather than adjusted for multiple comparisons, and do not combine
 training, test, and future-cohort uncertainty. The two-cluster solution has
 limited resample stability, and the cluster-feature ablation is exploratory.
+Report 8 additionally demonstrates that the original percentile intervals can
+under-cover in sparse known-truth scenarios. Nonempty zero-event intervals must
+not be interpreted as precise evidence of no effect. The new real-data analyses
+reuse the already inspected evaluation cohort and remain exploratory.
 
 Hillstrom supports evaluation of audience selection and the recorded email
 treatments. It cannot establish that newly generated messages or drip campaigns
