@@ -27,6 +27,12 @@ Read [Progress Report 8](docs/Progress_Reports/Progress_Report_8.docx), the
 template and planning checkpoint. All 26 automated tests pass in the existing
 environment; clean-environment installation remains unverified.
 
+The [Report 8 presentation with speaker notes](docs/presentations/Progress_Report_8_Presentation.pptx)
+provides 16 editable slides on results, completion by workstream, and all next
+steps. Its plain-language notes explain the findings and cite the supporting
+files. The presentation is dated November 9 and uses the November 4 research
+results; it does not report new model experiments or completed GenAI integration.
+
 **Steps 4 and 5 now have held-out evaluation and measured reliability. Step 6 includes customer segmentation and grounded GenAI drafts.** Both fixed baseline model families were refitted on development data and evaluated on the same 12,800 test customers. Paired confidence intervals, 100 random baseline rankings, and 20 training resamples per family are available. Clusters remain explanatory because the development ablation showed no targeting improvement. Message drafts have limited automated audits; independent message review and a new conversion experiment remain pending.
 
 Original workflow completed through **October 12, 2026**:
